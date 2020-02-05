@@ -1,0 +1,89 @@
+version: 2.1
+
+jobs:
+  validate:
+    machine:
+      image: ubuntu-1604:201903-01
+    steps:
+      - checkout
+      - run:
+          name: "Install Terraform"
+          command: |
+            sudo apt update
+            sudo apt install wget unzip
+            sudo wget https://releases.hashicorp.com/terraform/0.12.19/terraform_0.12.19_linux_amd64.zip
+            sudo unzip terraform_0.12.19_terraform_0.12.19_linux_amd64.zip –d /usr/local/bin
+            terraform -v
+      - run:
+          name: "Init Terraform"
+          command: terraform init
+      - run:
+          name: "Validate"
+          command: terraform validate
+  plan:
+    machine:
+      image: ubuntu-1604:201903-01
+    steps:
+      - checkout
+      - run:
+          name: "Install Terraform"
+          command: |
+            sudo apt update
+            sudo apt install wget unzip
+            sudo wget https://releases.hashicorp.com/terraform/0.12.19/terraform_0.12.19_linux_amd64.zip
+            sudo unzip terraform_0.12.19_terraform_0.12.19_linux_amd64.zip –d /usr/local/bin
+            terraform -v
+      - run:
+          name: "Init Terraform"
+          command: terraform init
+      - run:
+          name: "Plan"
+          command: terraform plan
+  apply:
+    machine:
+      image: ubuntu-1604:201903-01
+    steps:
+      - checkout
+      - run:
+          name: "Install Terraform"
+          command: |
+            sudo apt update
+            sudo apt install wget unzip
+            sudo wget https://releases.hashicorp.com/terraform/0.12.19/terraform_0.12.19_linux_amd64.zip
+            sudo unzip terraform_0.12.19_terraform_0.12.19_linux_amd64.zip –d /usr/local/bin
+            terraform -v
+      - run:
+          name: "Init Terraform"
+          command: terraform init
+      - run:
+          name: "Apply"
+          command: terraform apply
+
+workflows:
+  version: 2
+
+  development:
+    jobs:
+      - validate
+      - plan:
+          requires:
+            - validate
+  production:
+    jobs:
+      - validate:
+          filters:
+            branches:
+              only: master
+      - plan:
+          filters:
+            branches:
+              only: master
+          requires:
+            - validate
+      - apply:
+          filters:
+            branches:
+              only: master
+          requires:
+            - validate
+            - plan
