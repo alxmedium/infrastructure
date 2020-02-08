@@ -21,8 +21,10 @@ commands:
           name: "Download the Terraform ZIP"
           command: wget https://releases.hashicorp.com/terraform/0.12.19/terraform_0.12.19_linux_amd64.zip
       - run:
-          name: "Unzip terraform_0.12.19_linux_amd64.zip and move to /usr/local/bin"
-          command: unzip ./terraform_0.12.19_linux_amd64.zip –d /usr/local/bin
+          name: "Unzip terraform_0.12.19_linux_amd64.zip and move to /usr/bin"
+          command: |
+            unzip terraform_0.12.19_linux_amd64.zip
+            mv terraform /usr/bin
       - run:
           name: "Show the Terraform version"
           command: terraform -v
