@@ -1,62 +1,59 @@
 version: 2.1
 
+executors:
+  ubuntu:
+    docker:
+      - image: ubuntu:18.04
+
+commands:
+  setup_terraform:
+    description: "Install and update all the required packages to install terraform"
+    steps:
+      - run:
+          name: "Upgrade all the Ubuntu packages"
+          command: |
+            apt update
+            apt upgrade --yes
+      - run:
+          name: "Install wget and unzip"
+          command: apt install wget unzip --yes
+      - run:
+          name: "Download the Terraform ZIP"
+          command: wget https://releases.hashicorp.com/terraform/0.12.19/terraform_0.12.19_linux_amd64.zip
+      - run:
+          name: "Unzip terraform_0.12.19_linux_amd64.zip and move to /usr/local/bin"
+          command: unzip ./terraform_0.12.19_linux_amd64.zip –d /usr/local/bin
+      - run:
+          name: "Show the Terraform version"
+          command: terraform -v
+      - run:
+          name: "Initialize Terraform"
+          command: terraform init
+
 jobs:
   validate:
-    machine:
-      image: ubuntu-1604:201903-01
+    executor: ubuntu
     steps:
       - checkout
+      - setup_terraform
       - run:
-          name: "Install Terraform"
-          command: |
-            sudo apt update
-            sudo apt install wget unzip
-            sudo wget https://releases.hashicorp.com/terraform/0.12.19/terraform_0.12.19_linux_amd64.zip
-            sudo unzip terraform_0.12.19_terraform_0.12.19_linux_amd64.zip –d /usr/local/bin
-            terraform -v
-      - run:
-          name: "Init Terraform"
-          command: terraform init
-      - run:
-          name: "Validate"
+          name: "Validate the Infrastructure"
           command: terraform validate
   plan:
-    machine:
-      image: ubuntu-1604:201903-01
+    executor: ubuntu
     steps:
       - checkout
+      - setup_terraform
       - run:
-          name: "Install Terraform"
-          command: |
-            sudo apt update
-            sudo apt install wget unzip
-            sudo wget https://releases.hashicorp.com/terraform/0.12.19/terraform_0.12.19_linux_amd64.zip
-            sudo unzip terraform_0.12.19_terraform_0.12.19_linux_amd64.zip –d /usr/local/bin
-            terraform -v
-      - run:
-          name: "Init Terraform"
-          command: terraform init
-      - run:
-          name: "Plan"
+          name: "Show the Infrastructure Plan"
           command: terraform plan
   apply:
-    machine:
-      image: ubuntu-1604:201903-01
+    executor: ubuntu
     steps:
       - checkout
+      - setup_terraform
       - run:
-          name: "Install Terraform"
-          command: |
-            sudo apt update
-            sudo apt install wget unzip
-            sudo wget https://releases.hashicorp.com/terraform/0.12.19/terraform_0.12.19_linux_amd64.zip
-            sudo unzip terraform_0.12.19_terraform_0.12.19_linux_amd64.zip –d /usr/local/bin
-            terraform -v
-      - run:
-          name: "Init Terraform"
-          command: terraform init
-      - run:
-          name: "Apply"
+          name: "Apply the Infrastructure Plan"
           command: terraform apply
 
 workflows:
@@ -64,8 +61,14 @@ workflows:
 
   development:
     jobs:
-      - validate
+      - validate:
+          filters:
+            branches:
+              ignore: master
       - plan:
+          filters:
+            branches:
+              ignore: master
           requires:
             - validate
   production:
