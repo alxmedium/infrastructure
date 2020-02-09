@@ -56,7 +56,10 @@ jobs:
       - setup_terraform
       - run:
           name: "Apply the Infrastructure Plan"
-          command: terraform apply
+          command: |
+            terraform apply \
+            -var aws_access_key_id=$AWS_ACCESS_KEY_ID \
+            -var aws_secret_access_key=$AWS_SECRET_ACCESS_KEY
 
 workflows:
   version: 2
