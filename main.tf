@@ -14,16 +14,12 @@ provider "aws" {
 }
 
 resource "aws_iam_user" "alxmedium_circleci_iam_user" {
-  name = "alxmedium_circleci_iam_user"
+  name = "alxmedium_circleci"
   path = "/"
 }
 
-resource "aws_iam_access_key" "alxmedium_circleci_iam_access_key" {
-  user = aws_iam_user.alxmedium_circleci_iam_user.name
-}
-
 resource "aws_iam_user_policy" "alxmedium_circleci_iam_user_policy" {
-  name   = "alxmedium_circleci_iam_user_policy"
+  name   = "alxmedium_circleci"
   user   = aws_iam_user.alxmedium_circleci_iam_user.name
   policy = <<EOF
 {
@@ -32,55 +28,10 @@ resource "aws_iam_user_policy" "alxmedium_circleci_iam_user_policy" {
         {
             "Effect": "Allow",
             "Action": [
-                "iam:GenerateCredentialReport",
-                "iam:GenerateServiceLastAccessedDetails",
                 "iam:Get*",
-                "iam:List*",
-                "iam:SimulateCustomPolicy",
-                "iam:SimulatePrincipalPolicy"
+                "iam:PutUserPolicy*"
             ],
             "Resource": "*"
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "ec2:DescribeRouteTables",
-                "ec2:CreateRoute",
-                "ec2:DeleteRoute",
-                "ec2:ReplaceRoute"
-            ],
-            "Resource": [
-                "*"
-            ]
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "ec2:DescribeNetworkInterfaces",
-                "ec2:CreateNetworkInterface",
-                "ec2:DeleteNetworkInterface",
-                "ec2:CreateNetworkInterfacePermission",
-                "ec2:DeleteNetworkInterfacePermission",
-                "ec2:DescribeNetworkInterfacePermissions",
-                "ec2:ModifyNetworkInterfaceAttribute",
-                "ec2:DescribeNetworkInterfaceAttribute",
-                "ec2:DescribeAvailabilityZones",
-                "ec2:DescribeVpcs",
-                "ec2:DescribeSubnets"
-            ],
-            "Resource": [
-                "*"
-            ]
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "ec2:AssignPrivateIpAddresses",
-                "ec2:UnassignPrivateIpAddresses"
-            ],
-            "Resource": [
-                "*"
-            ]
         }
     ]
 }
