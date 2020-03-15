@@ -51,20 +51,15 @@ jobs:
           command: |
             terraform plan \
             -var aws_access_key_id=$AWS_ACCESS_KEY_ID \
-            -var aws_secret_access_key=$AWS_SECRET_ACCESS_KEY
+            -var aws_secret_access_key=$AWS_SECRET_ACCESS_KEY \
+            -var ip_connection_machine=$IP_CONNECTION_MACHINE
 
 workflows:
   version: 2
 
   development:
     jobs:
-      - validate:
-          filters:
-            branches:
-              ignore: master
+      - validate
       - plan:
-          filters:
-            branches:
-              ignore: master
           requires:
             - validate
